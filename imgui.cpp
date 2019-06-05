@@ -289,7 +289,7 @@ CODE
              const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
              if (pcmd->UserCallback)
              {
-                 pcmd->UserCallback(cmd_list, pcmd);
+                 pcmd->UserCallback(cmd_list, pcmd, NULL);
              }
              else
              {
@@ -369,6 +369,14 @@ CODE
  When you are not sure about a old symbol or function name, try using the Search/Find function of your IDE to look for comments or references in all imgui files.
  You can read releases logs https://github.com/ocornut/imgui/releases for more details.
 
+ - 2019/XX/XX (1.XX) - added an extra 'void* renderer_user_data' parameter to ImDrawCallback (stored in ImDrawCmd::UserCallback).
+                       this allows custom rendering back-ends to pass custom local rendering information to the callback.
+                       if you use an renderer back-end based on or copied from one before version 1.71, compilation will fail on this line:
+                           pcmd->UserCallback(cmd_list, pcmd);
+                       you can fix it by adding a trailing NULL parameter:
+                           pcmd->UserCallback(cmd_list, pcmd, NULL);
+                       if your back-end needs to support multiple versions, you can use a '#if (IMGUI_VERSION_NUM >= 17004)' test.
+                       if you are using an old copied back-end, consider building the one directly in the imgui repository.
  - 2019/06/07 (1.71) - rendering of child window outer decorations (bg color, border, scrollbars) is now performed as part of the parent window. If you have
                        overlapping child windows in a same parent, and relied on their relative z-order to be mapped to their submission order, this will affect your rendering.
                        This optimization is disabled if the parent window has no visual output, because it appears to be the most common situation leading to the creation of overlapping child windows.
